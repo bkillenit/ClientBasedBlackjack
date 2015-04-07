@@ -2,152 +2,153 @@ var RANK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
 var SUIT = ["spades", "clubs", "hearts", "diamonds"];
 
-var Deck = {
-    deckCards: [],
-    deckPos: 0,
+var Deck = function() {
+    tempDeckCards = [];
+    this.deckPos = 0;
 
-    construct: function () {
-        var index;
+    var index;
 
-        $.each(RANK, function( i, rankVal ) {
-            $.each(SUIT, function( k, suitVal ) {
-                //alert(Deck.deckCards);
-                Deck.deckCards.push([rankVal,suitVal]);
-            });
+    $.each(RANK, function( i, rankVal ) {
+        $.each(SUIT, function( k, suitVal ) {
+            //alert(Deck.deckCards);
+            tempDeckCards.push([rankVal,suitVal]);
         });
-    },
+    });
 
-    shuffle: function () {
-        for(var i = 0; i < 26; i++){
-            var randPos = Math.floor(Math.random()*52);
-            if(randPos == i)
-                randPos = Math.floor(Math.random()*52);
-            var temp = Deck.deckCards[randPos];
-            Deck.deckCards[randPos] = Deck.deckCards[i];
-            Deck.deckCards[i] = temp;
-        }
-    },
+    this.deckCards = tempDeckCards;
+};
 
-    deal: function () {
-        Deck.deckPos++;
-        return this.deckCards[Deck.deckPos-1];
-    },
-
-    rankToString: function (c) {
-        var rankString;
-        switch(c) {
-            case 1:
-                rankString = "ace";
-                break;
-            case 11:
-                rankString = "jack";
-                break;
-            case 12:
-                rankString = "queen";
-                break;
-            case 13:
-                rankString = "king";
-                break;
-            default:
-                rankString = c.toString();
-        }
-
-        return rankString;
+Deck.prototype.shuffle = function () {
+    for(var i = 0; i < 26; i++){
+        var randPos = Math.floor(Math.random()*52);
+        if(randPos == i)
+            randPos = Math.floor(Math.random()*52);
+        var temp = this.deckCards[randPos];
+        this.deckCards[randPos] = this.deckCards[i];
+        this.deckCards[i] = temp;
     }
 }
 
-var Player = {
-    construct: function() {
-        var player = {
+Deck.prototype.deal = function () {
+    this.deckPos++;
+    return this.deckCards[this.deckPos-1];
+};
 
-            cardsHolding: new Array(5),
-            cardIndex: 0,
-            total: 0,
-            aceCounter: 0,
-            wins: 0,
+Deck.prototype.rankToString = function (c) {
+    var rankString;
+    switch(c) {
+        case 1:
+            rankString = "ace";
+            break;
+        case 11:
+            rankString = "jack";
+            break;
+        case 12:
+            rankString = "queen";
+            break;
+        case 13:
+            rankString = "king";
+            break;
+        default:
+            rankString = c.toString();
+    }
 
-            addCard: function (c) {
-                this.cardsHolding[this.cardIndex] = c;
-                this.cardsValue();
+    return rankString;
+};
 
-                this.cardIndex++;
-            },
+var Player = function() {
+    this.cardsHolding =  new Array(5);
+    this.cardIndex = 0;
+    this.total = 0;
+    this.aceCounter = 0;
+    this.wins = 0;
+};
 
-            cardsValue: function () {
-                // using for loop instead of $.each() form jQuery to avoid scoping error of the jQuery method
-                // which keeps us from accessing any value outside of the loops scope, such as this.total
-                var rankValue = this.cardsHolding[this.cardIndex] ;
+Player.prototype.clear = function() {
+    delete this.cardsHolding;
+    delete this.cardIndex;
+    delete this.total;
+    delete this.aceCounter;
+    delete this.wins;
+}
 
-                if ( rankValue != 1 ) {
-                    if( rankValue > 10 ) 
-                        this.total += 10;
-                    else 
-                        this.total += rankValue;
+Player.prototype.addCard = function (c) {
+    this.cardsHolding[this.cardIndex] = c;
+    this.cardsValue();
 
-                    if ( this.aceCounter == 1 && this.total > 21) {
-                        this.total -= 10;
-                        this.aceCounter++;
-                    }
-                }
-                else {
-                    switch(this.aceCounter){
-                    case 0:
-                        if( this.total > 10 ) 
-                            this.total += 1;
-                        else { 
-                            this.total += 11;
-                        }
-                        break;
-                    case 1:
-                        this.aceCounter--;
-                        this.total += 1;
-                        break;
-                    default:
-                        this.total += 1;
-                        break;
-                    }
+    this.cardIndex++;
+};
 
-                    this.aceCounter++;
-                }
-            },
+Player.prototype.cardsValue = function () {
+    // using for loop instead of $.each() form jQuery to avoid scoping error of the jQuery method
+    // which keeps us from accessing any value outside of the loops scope, such as this.total
+    var rankValue = this.cardsHolding[this.cardIndex] ;
 
-            // returns a string of the value of the cards a player is currently holding, and adjust for 
-            // soft versus hard numbers with the inclusion of aces. Ex. (17/7) for hand containing Ace,7
-            getTotal: function () {
-                if ( this.aceCounter == 1 ) {
-                    if ( this.total != 21 ) {
-                        var soft = this.total - 10;
-                        return this.total + "/" + soft;
-                    } else {
-                        return "21";
-                    }
-                } 
-                else {
-                    return this.total;
-                }
-            },
+    if ( rankValue != 1 ) {
+        if( rankValue > 10 ) 
+            this.total += 10;
+        else 
+            this.total += rankValue;
 
-            // refactor the conditional tree to decrease calling of the disablePlayerButtons function
-            checkStatus: function() {
-                if ( this.total > 21 ) {
-                    $('#playerStatus').text("You busted, please try again");
-                    disablePlayerButtons();
-                }
-                else if( this.total == 21 ) {
-                    $('#playerStatus').text("Blackjack!");
-                    disablePlayerButtons();
-                }
-                else {
-                    if( this.cardIndex < 5 ) 
-                        $('#playerStatus').text("Hit or Stay?");
-                    else {
-                        $('#playerStatus').text("You have reached the card limt of 5. Passing turn to dealer.");
-                        disablePlayerButtons();
-                    }
-                }
+        if ( this.aceCounter == 1 && this.total > 21) {
+            this.total -= 10;
+            this.aceCounter++;
+        }
+    }
+    else {
+        switch(this.aceCounter){
+        case 0:
+            if( this.total > 10 ) 
+                this.total += 1;
+            else { 
+                this.total += 11;
             }
-        } // end of player class
+            break;
+        case 1:
+            this.aceCounter--;
+            this.total += 1;
+            break;
+        default:
+            this.total += 1;
+            break;
+        }
 
-        return player;
+        this.aceCounter++;
     }
-}
+};
+
+// returns a string of the value of the cards a player is currently holding, and adjust for 
+// soft versus hard numbers with the inclusion of aces. Ex. (17/7) for hand containing Ace,7
+Player.prototype.getTotal = function () {
+    if ( this.aceCounter == 1 ) {
+        if ( this.total != 21 ) {
+            var soft = this.total - 10;
+            return this.total + "/" + soft;
+        } else {
+            return "21";
+        }
+    } 
+    else {
+        return this.total;
+    }
+};
+
+// refactor the conditional tree to decrease calling of the disablePlayerButtons function
+Player.prototype.checkStatus = function() {
+    if ( this.total > 21 ) {
+        $('#playerStatus').text("You busted, please try again");
+        disablePlayerButtons();
+    }
+    else if( this.total == 21 ) {
+        $('#playerStatus').text("Blackjack!");
+        disablePlayerButtons();
+    }
+    else {
+        if( this.cardIndex < 5 ) 
+            $('#playerStatus').text("Hit or Stay?");
+        else {
+            $('#playerStatus').text("You have reached the card limt of 5. Passing turn to dealer.");
+            disablePlayerButtons();
+        }
+    }
+};
