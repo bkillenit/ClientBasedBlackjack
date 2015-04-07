@@ -1,0 +1,93 @@
+body { 
+	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */ 
+	font-family: Corbel, "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", "Bitstream Vera Sans", "Liberation Sans", Verdana, "Verdana Ref", sans-serif;
+
+}
+
+#dealer-container, .player-container {
+	width: 700px;
+}
+
+.card {
+	margin: 10px 10px;
+	display: inline-block;
+}
+
+.button {
+	font-size: 1.4em;
+	margin: 20px 0px;
+	padding: 10px 20px;
+	width: 50px;
+	color: white;
+	display: block;
+
+}
+
+.player {
+	min-width: 275px;
+	height: 150px;
+	border: 1px solid black;
+	padding: 5px 10px 5px 10px;
+	text-align: left;
+	display: inline-block;
+}
+
+.boxTitle {
+	height: 20px;
+}
+
+.boxTitleText {
+	font-weight: bold;
+	float: left;
+}
+
+#deck {
+	display: inline-block;
+	margin-left: 25px;
+	margin-top: 30px;
+	vertical-align: top;
+}
+
+.total {
+	text-align: right;
+	float: right;
+}
+
+.player-container {
+	margin-top: 70px;
+}
+
+#playerStatus {
+	color: red;
+}
+
+#cardField {
+	vertical-align: top;
+}
+
+#actionButtons {
+	display: inline-block;
+	margin-top: 5px;
+	margin-left: 20px;
+}
+
+#wins {
+	margin: 0px;
+}
+
+#hit {
+	background-color: blue;
+}
+
+#stay {
+	background-color: green;
+}
+
+.disabled {
+	opacity: .3;
+}
+
+#hit:hover, #stay:hover {
+	color: black;
+	cursor: pointer;
+}
