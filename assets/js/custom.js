@@ -17,11 +17,11 @@ dealer.turn = function() {
     }
 }
 
-var buttons = ['hit', 'stay'];
-
 function disablePlayerButtons() {
-    buttons.forEach(function(value){
-        var idString = '#' + value;
+    var buttons = ['hit', 'stay'];
+
+    $.each(buttons, function(i, buttonName){
+        var idString = '#' + buttonName;
         $(idString).addClass('disabled');
         $(idString).off('click');
     });
@@ -48,7 +48,7 @@ $( document ).ready(function() {
             var cardString = Deck.rankToString(card[0]) + card[1];
             $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="">').appendTo( $("#dealersCards") );
         // }
-        
+
         card = Deck.deal();
         player1.addCard(card[0]);
         cardString = Deck.rankToString(card[0]) + card[1];
@@ -79,4 +79,9 @@ $('#hit').click(function() {
 $('#stay').click(function() {
     disablePlayerButtons();
     // pass turn to dealer
+});
+
+$('#reset').click(function() {
+    // temporary solution, want to reinitialize classes and restore state of UI so page doesnt have to reload
+    location.reload();
 });

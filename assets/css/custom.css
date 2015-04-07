@@ -20,7 +20,10 @@ body {
 	width: 50px;
 	color: white;
 	display: block;
+}
 
+.button:first-of-type {
+	margin-top: 1px;
 }
 
 .player {
@@ -66,8 +69,9 @@ body {
 }
 
 #actionButtons {
+	position: relative;
 	display: inline-block;
-	margin-top: 5px;
+	top: -20px;
 	margin-left: 20px;
 }
 
@@ -83,11 +87,15 @@ body {
 	background-color: green;
 }
 
-.disabled {
-	opacity: .3;
+#reset {
+	background-color: gray;
 }
 
-#hit:hover, #stay:hover {
+#actionButtons > .button:hover {
 	color: black;
 	cursor: pointer;
+}
+
+.disabled {
+	opacity: .3;
 }
