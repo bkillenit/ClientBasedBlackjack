@@ -36,6 +36,11 @@ function displayPlayerWin() {
     $('#wins > #winTotal').text(player1.wins);
 }
 
+function displayPush() {
+    disablePlayerButtons();
+    $('#playerStatus').text('You have tied the dealer');
+}
+
 $( document ).ready(function() {
     // alert("yay");
     $('#hit').on('click', hitFunction);
@@ -50,17 +55,19 @@ function comparePlayerResults() {
     // failsafe to parse out the numerical value of the player's and dealer's total
     // TODO: remove when the player and dealer classes available functions are refactored
     if(typeof player1Total == 'string'){
-        player1Total = parseInt(player1Total.slice(0,1));
+        player1Total = parseInt(player1Total.slice(0,2));
     }
 
     if(typeof dealerTotal == 'string'){
-        dealerTotal = parseInt(dealerTotal.slice(0,1));
+        dealerTotal = parseInt(dealerTotal.slice(0,2));
     }
 
-    // TODO: does the dealer or player win ties?
     if( dealerTotal > player1Total ) {
         displayDealerWin();
-    } else {
+    } else if( dealerTotal == player1Total ) {
+        displayPush();
+    }
+    else {
         displayPlayerWin();
     }
 }

@@ -166,6 +166,12 @@ Dealer.prototype = new Player();
 // recursively making the dealer take turns until he hits a base case, which is a winning or losing condition
 Dealer.prototype.takeTurn = function() {
     var dealerTotal  = this.getTotal();
+    var totalIncludesBigAce = false;
+
+    if(typeof dealerTotal == 'string'){
+        dealerTotal = parseInt(dealerTotal.slice(0,2));
+        totalIncludesBigAce = true;
+    }
 
     if(dealerTotal > 21) {
         $('#playerStatus').text('The dealer has busted');
@@ -174,16 +180,10 @@ Dealer.prototype.takeTurn = function() {
     else if(dealerTotal == 21) {
         displayDealerWin();
     }
-    else if( this.cardIndex == 5) {
+    else if( (this.cardIndex == 5) || (dealerTotal == 17 && dealer.aceCounter > 0) || (dealerTotal >= 17 && !totalIncludesBigAce) ) {
         comparePlayerResults();
     }
-    // the dealer has a soft 17 and must stand
-    else if( dealerTotal == 17 && dealer.aceCounter > 0 ) {
-        comparePlayerResults();
-    }
-    else if( dealerTotal >= 17) {
-        comparePlayerResults();
-    } else {
+    else {
         // deal another card for the dealer
         var card = deck.deal();
         this.addCard(card[0]);
