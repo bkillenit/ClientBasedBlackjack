@@ -122,6 +122,8 @@ Player.prototype.cardsValue = function () {
 
 // returns a string of the value of the cards a player is currently holding, and adjust for 
 // soft versus hard numbers with the inclusion of aces. Ex. (17/7) for hand containing Ace,7
+// TODO: refactor to return an array containing the highest numeric total of the hand and a boolean 
+// indicating if the 11 value of an Ace was used to compute the total. ie. total[number, bigAceValUsed]
 Player.prototype.getTotal = function () {
     if ( this.aceCounter == 1 ) {
         if ( this.total != 21 ) {
@@ -168,11 +170,14 @@ Dealer.prototype.takeTurn = function() {
     var dealerTotal  = this.getTotal();
     var totalIncludesBigAce = false;
 
+    // if the total returns in format 17/7 then there is room for the player to hit, the game logic needs a number
+    // for comparison however. The conditional below handles those cases.
     if(typeof dealerTotal == 'string'){
         dealerTotal = parseInt(dealerTotal.slice(0,2));
         totalIncludesBigAce = true;
     }
 
+    // conditional block to tell the dealer what to do next in the game tree based on his current hand's state
     if(dealerTotal > 21) {
         $('#playerStatus').text('The dealer has busted');
         displayPlayerWin();
