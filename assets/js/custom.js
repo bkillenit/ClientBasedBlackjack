@@ -8,18 +8,6 @@ window.player1 = {};
 window.dealer = {};
 window.deck = {};
 
-dealer.turn = function() {
-    var dealerStatus  = dealer.cardsValue();
-
-    if( dealerStatus == 17 && dealer.aceCounter > 0 ) {
-        var card = Deck.deal();
-        dealer.addCard(card[0]);
-
-        var cardString = Deck.rankToString(card[0]) + card[1];
-        $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="">').appendTo( $("#dealersCards") );
-    }
-}
-
 var buttons = ['hit', 'stay'];
 
 function disablePlayerButtons() {
@@ -36,6 +24,18 @@ function enablePlayersButtons() {
     });
 }
 
+function displayDealerWin() {
+    disablePlayerButtons();
+    $('#playerStatus').text('The dealer has won');
+}
+
+function displayPlayerWin() {
+    disablePlayerButtons();
+    player1.wins++;
+    $('#playerStatus').text('You have won! Congratulations!');
+    $('#wins > #winTotal').text(player1.wins);
+}
+
 $( document ).ready(function() {
     // alert("yay");
     $('#hit').on('click', hitFunction);
@@ -43,13 +43,35 @@ $( document ).ready(function() {
     initializeGame();
 });
 
+function comparePlayerResults() {
+    var player1Total = player1.getTotal();
+    var dealerTotal = dealer.getTotal();
+
+    // failsafe to parse out the numerical value of the player's and dealer's total
+    // TODO: remove when the player and dealer classes available functions are refactored
+    if(typeof player1Total == 'string'){
+        player1Total = parseInt(player1Total.slice(0,1));
+    }
+
+    if(typeof dealerTotal == 'string'){
+        dealerTotal = parseInt(dealerTotal.slice(0,1));
+    }
+
+    // TODO: does the dealer or player win ties?
+    if( dealerTotal > player1Total ) {
+        displayDealerWin();
+    } else {
+        displayPlayerWin();
+    }
+}
+
 function initializeGame() {
     // constructs the Deck object and shuffles the multi-dimensional array :format[["rank","suit"],["...","..."]]
     // we will alwyas only have one deck, and therefore it isn't necessary to construct another variable
     deck = new Deck();
     deck.shuffle();
     player1 = new Player();
-    dealer = new Player();
+    dealer = new Dealer();
 
     // loops the deal to each player and the dealer twice
     for(var i=1; i <= 2; i++) {
@@ -67,7 +89,13 @@ function initializeGame() {
     $('#dealersNumber').text( dealer.getTotal() );
     $('#yourNumber').text( player1.getTotal() );
 
-    setTimeout(function(){player1.checkStatus()},100);
+    // if the dealer has 21, the dealer wins no matter what 2 cards the player has. pass turn to the player if
+    // the dealer does not have 21 to begin the turn
+    if( dealer.getTotal() == 21 ) {
+        displayDealerWin();
+    } else {
+        setTimeout(function(){player1.checkStatus()},100);
+    }
 }
 
 function hitFunction() {
@@ -86,7 +114,9 @@ function hitFunction() {
 
 function stayFunction() {
     disablePlayerButtons();
+
     // pass turn to dealer
+    dealer.takeTurn();
 };
 
 $('#reset').click(function() {
@@ -97,5 +127,6 @@ $('#reset').click(function() {
     if( $._data($('#hit')[0], "events") == undefined) {
         enablePlayersButtons();
     }
+
     initializeGame();
 });

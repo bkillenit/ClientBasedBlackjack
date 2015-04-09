@@ -27,7 +27,7 @@ Deck.prototype.shuffle = function () {
         this.deckCards[randPos] = this.deckCards[i];
         this.deckCards[i] = temp;
     }
-}
+};
 
 Deck.prototype.deal = function () {
     this.deckPos++;
@@ -61,6 +61,10 @@ var Player = function() {
     this.cardIndex = 0;
     this.total = 0;
     this.aceCounter = 0;
+
+    //alert(this.wins);
+
+    // need to find a way to not initialize this if a value already exists
     this.wins = 0;
 };
 
@@ -69,7 +73,6 @@ Player.prototype.clear = function() {
     delete this.cardIndex;
     delete this.total;
     delete this.aceCounter;
-    delete this.wins;
 }
 
 Player.prototype.addCard = function (c) {
@@ -100,7 +103,7 @@ Player.prototype.cardsValue = function () {
         case 0:
             if( this.total > 10 ) 
                 this.total += 1;
-            else { 
+            else {
                 this.total += 11;
             }
             break;
@@ -127,7 +130,7 @@ Player.prototype.getTotal = function () {
         } else {
             return "21";
         }
-    } 
+    }
     else {
         return this.total;
     }
@@ -141,7 +144,7 @@ Player.prototype.checkStatus = function() {
     }
     else if( this.total == 21 ) {
         $('#playerStatus').text("Blackjack!");
-        disablePlayerButtons();
+        displayPlayerWin();
     }
     else {
         if( this.cardIndex < 5 ) 
@@ -149,6 +152,54 @@ Player.prototype.checkStatus = function() {
         else {
             $('#playerStatus').text("You have reached the card limt of 5. Passing turn to dealer.");
             disablePlayerButtons();
+            dealer.takeTurn();
         }
     }
 };
+
+// blank function which serves as a constructor target for the Dealer class
+var Dealer = function() {};
+
+// Dealer extends a player
+Dealer.prototype = new Player();
+
+// recursively making the dealer take turns until he hits a base case, which is a winning or losing condition
+Dealer.prototype.takeTurn = function() {
+    var dealerTotal  = this.getTotal();
+
+    if(dealerTotal > 21) {
+        $('#playerStatus').text('The dealer has busted');
+        displayPlayerWin();
+    }
+    else if(dealerTotal == 21) {
+        displayDealerWin();
+    }
+    else if( this.cardIndex == 5) {
+        comparePlayerResults();
+    }
+    // the dealer has a soft 17 and must stand
+    else if( dealerTotal == 17 && dealer.aceCounter > 0 ) {
+        comparePlayerResults();
+    }
+    else if( dealerTotal >= 17) {
+        comparePlayerResults();
+    } else {
+        // deal another card for the dealer
+        var card = deck.deal();
+        this.addCard(card[0]);
+        $('#dealersNumber').text(this.getTotal());
+
+        var cardString = deck.rankToString(card[0]) + card[1];
+        $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="">').appendTo( $("#dealersCards") );
+
+        // sleep(2);
+        this.takeTurn();
+    }
+};
+
+function sleep(miliseconds) {
+   var currentTime = new Date().getTime();
+
+   while (currentTime + miliseconds >= new Date().getTime()) {
+   }
+}
