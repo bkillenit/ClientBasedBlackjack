@@ -62,17 +62,17 @@ var Player = function() {
     this.total = 0;
     this.aceCounter = 0;
 
-    //alert(this.wins);
-
     // need to find a way to not initialize this if a value already exists
     this.wins = 0;
 };
 
+// TODO: find better way to reinitilize the property variables instead of calling this function
+// would make the code more DRY
 Player.prototype.clear = function() {
-    delete this.cardsHolding;
-    delete this.cardIndex;
-    delete this.total;
-    delete this.aceCounter;
+    this.cardsHolding =  new Array(5);
+    this.cardIndex = 0;
+    this.total = 0;
+    this.aceCounter = 0;
 }
 
 Player.prototype.addCard = function (c) {

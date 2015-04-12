@@ -3,10 +3,10 @@
 // *TODO have input for the amount of players wanted by user, up to 5 
 // and use for loop to construct player objects
 
-// more robust way of declaring local variables in javascript
-window.player1 = {};
-window.dealer = {};
-window.deck = {};
+// more robust way of declaring global variables in javascript, according to the MDN docs
+window.player1 = undefined;
+window.dealer = undefined;
+window.deck = undefined;
 
 var buttons = ['hit', 'stay'];
 
@@ -77,20 +77,19 @@ function initializeGame() {
     // we will alwyas only have one deck, and therefore it isn't necessary to construct another variable
     deck = new Deck();
     deck.shuffle();
-    player1 = new Player();
+    if(player1 == undefined) {
+        player1 = new Player();
+    } else {
+        // clearing most property values of player1 instead of constructing the instance so the win
+        // count of each player persists
+        player1.clear();
+    }
     dealer = new Dealer();
 
-    // loops the deal to each player and the dealer twice
+    // loops the deal to each player and the dealer twice, as dicatated by the game's rules
     for(var i=1; i <= 2; i++) {
-        var card = deck.deal();
-        dealer.addCard(card[0]);
-        var cardString = deck.rankToString(card[0]) + card[1];
-        $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="">').appendTo( $("#dealersCards") );
-
-        card = deck.deal();
-        player1.addCard(card[0]);
-        cardString = deck.rankToString(card[0]) + card[1];
-        $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="">').appendTo( $("#playersCards") );
+        dealCard(dealer);
+        dealCard(player1);
     }
 
     $('#dealersNumber').text( dealer.getTotal() );
@@ -105,18 +104,24 @@ function initializeGame() {
     }
 }
 
-function hitFunction() {
-    //alert("Yay, you hit!");
+function dealCard( player ) {
     var card = deck.deal();
-    player1.addCard(card[0]);
-
+    player.addCard(card[0]);
     var cardString = deck.rankToString(card[0]) + card[1];
-    $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="">').appendTo( $("#playersCards") );
 
+    //TODO: refactor logic to handle multiple players
+    if (player instanceof Dealer) {
+        $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="' + cardString + '">').appendTo( $("#dealersCards") );
+    } else {
+        $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="' + cardString + '">').appendTo( $("#playersCards") );
+    }
+}
+
+function hitFunction() {
+    dealCard(player1);
     $('#yourNumber').text( player1.getTotal() );
 
-    setTimeout(function(){player1.checkStatus()},100);
-    // player.validateStatus();
+    player1.checkStatus();
 };
 
 function stayFunction() {
@@ -127,8 +132,6 @@ function stayFunction() {
 };
 
 $('#reset').click(function() {
-    // temporary solution, want to reinitialize classes and restore state of UI so page doesnt have to reload
-    // Reload the current page, without using the cache.
     $("#playersCards").empty();
     $("#dealersCards").empty();
     if( $._data($('#hit')[0], "events") == undefined) {
