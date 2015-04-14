@@ -44,6 +44,7 @@ function displayPush() {
 function revealDealersHand() {
     var hiddenCard = dealer.getHiddenCard();
     var cardString = deck.rankToString(hiddenCard[0]) + hiddenCard[1];
+    $('#dealersNumber').text(dealer.getTotal());
 
     $("#hiddenCard").attr("src","assets/img/classic-cards/" + cardString + ".png");
 }
@@ -104,6 +105,7 @@ function initializeGame() {
     // if the dealer has 21, the dealer wins no matter what 2 cards the player has. pass turn to the player if
     // the dealer does not have 21 to begin the turn
     if( dealer.getTotal() == 21 ) {
+        revealDealersHand();
         displayDealerWin();
     } else {
         setTimeout(function(){player1.checkStatus()},100);
@@ -146,6 +148,8 @@ function stayFunction() {
 $('#reset').click(function() {
     $("#playersCards").empty();
     $("#dealersCards").empty();
+    $('#dealersNumber').text('?');
+
     if( $._data($('#hit')[0], "events") == undefined) {
         enablePlayersButtons();
     }

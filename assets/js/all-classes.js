@@ -143,10 +143,13 @@ Player.prototype.checkStatus = function() {
     if ( this.total > 21 ) {
         $('#playerStatus').text("You busted, please try again");
         disablePlayerButtons();
+        revealDealersHand();
     }
     else if( this.total == 21 ) {
         $('#playerStatus').text("Blackjack!");
         disablePlayerButtons();
+        revealDealersHand();
+
         if( this.cardIndex > 2 ) {
             dealer.takeTurn();
         } else {
@@ -159,6 +162,7 @@ Player.prototype.checkStatus = function() {
         else {
             $('#playerStatus').text("You have reached the card limt of 5. Passing turn to dealer.");
             disablePlayerButtons();
+            revealDealersHand();
             dealer.takeTurn();
         }
     }
