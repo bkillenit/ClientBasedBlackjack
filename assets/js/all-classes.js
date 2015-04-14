@@ -146,10 +146,15 @@ Player.prototype.checkStatus = function() {
     }
     else if( this.total == 21 ) {
         $('#playerStatus').text("Blackjack!");
-        displayPlayerWin();
+        disablePlayerButtons();
+        if( this.cardIndex > 2 ) {
+            dealer.takeTurn();
+        } else {
+            displayPlayerWin();
+        }
     }
     else {
-        if( this.cardIndex < 5 ) 
+        if( this.cardIndex < 5 )
             $('#playerStatus').text("Hit or Stay?");
         else {
             $('#playerStatus').text("You have reached the card limt of 5. Passing turn to dealer.");
@@ -160,7 +165,9 @@ Player.prototype.checkStatus = function() {
 };
 
 // blank function which serves as a constructor target for the Dealer class
-var Dealer = function() {};
+var Dealer = function() {
+    this.hiddenCard = [];
+};
 
 // Dealer extends a player
 Dealer.prototype = new Player();
@@ -197,10 +204,13 @@ Dealer.prototype.takeTurn = function() {
         var cardString = deck.rankToString(card[0]) + card[1];
         $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="">').appendTo( $("#dealersCards") );
 
-        // sleep(2);
         this.takeTurn();
     }
 };
+
+Dealer.prototype.getHiddenCard = function() {
+    return this.hiddenCard;
+}
 
 function sleep(miliseconds) {
    var currentTime = new Date().getTime();

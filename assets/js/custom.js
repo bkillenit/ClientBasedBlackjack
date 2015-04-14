@@ -41,6 +41,13 @@ function displayPush() {
     $('#playerStatus').text('You have tied the dealer');
 }
 
+function revealDealersHand() {
+    var hiddenCard = dealer.getHiddenCard();
+    var cardString = deck.rankToString(hiddenCard[0]) + hiddenCard[1];
+
+    $("#hiddenCard").attr("src","assets/img/classic-cards/" + cardString + ".png");
+}
+
 $( document ).ready(function() {
     // alert("yay");
     $('#hit').on('click', hitFunction);
@@ -92,7 +99,6 @@ function initializeGame() {
         dealCard(player1);
     }
 
-    $('#dealersNumber').text( dealer.getTotal() );
     $('#yourNumber').text( player1.getTotal() );
 
     // if the dealer has 21, the dealer wins no matter what 2 cards the player has. pass turn to the player if
@@ -111,7 +117,12 @@ function dealCard( player ) {
 
     //TODO: refactor logic to handle multiple players
     if (player instanceof Dealer) {
-        $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="' + cardString + '">').appendTo( $("#dealersCards") );
+        if( player.cardIndex > 1 ) {
+            $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="' + cardString + '">').appendTo( $("#dealersCards") );
+        } else {
+            $('<img src="assets/img/classic-cards/b1fv.png" id="hiddenCard" class="card" alt="card-back">').appendTo( $("#dealersCards") );
+            player.hiddenCard = card;
+        }
     } else {
         $('<img src="assets/img/classic-cards/' + cardString + '.png" class="card" alt="' + cardString + '">').appendTo( $("#playersCards") );
     }
@@ -128,6 +139,7 @@ function stayFunction() {
     disablePlayerButtons();
 
     // pass turn to dealer
+    revealDealersHand();
     dealer.takeTurn();
 };
 
